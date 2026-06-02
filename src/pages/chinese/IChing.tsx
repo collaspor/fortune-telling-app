@@ -107,7 +107,7 @@ export default function IChing() {
     setShowResult(false)
 
     // Simulate casting 6 lines (one at a time for dramatic effect)
-    const newLines: Array<{ type: string; changing: boolean }> = []
+    const newLines: Array<{ type: '老阳' | '老阴' | '少阳' | '少阴'; changing: boolean }> = []
     for (let i = 0; i < 6; i++) {
       await new Promise((r) => setTimeout(r, 400))
       newLines.push(tossCoins())

@@ -3,7 +3,7 @@
  * Simulates coin tosses to generate hexagrams and interprets them.
  */
 import type { IChingLine, IChingResult, Hexagram } from '@/types'
-import { HEXAGRAMS } from '@/data/iching/hexagrams'
+import { hexagrams as HEXAGRAMS } from '@/data/iching/hexagrams'
 
 /**
  * Map of trigram values to their names.
