@@ -5,130 +5,129 @@ import { Input } from '@/components/Input'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import FortuneResult from '@/components/FortuneResult'
 
-// 64 Hexagram names (abbreviated — full set)
+// Full 64 hexagram data with expanded interpretations
 const HEXAGRAMS: Record<number, { name: string; symbol: string; judgment: string; interpretation: string }> = {
-  1: { name: '乾为天', symbol: '䷀', judgment: '元亨利贞', interpretation: '乾卦为六十四卦之首，象征天道运行，刚健不息。得此卦者宜积极进取，自强不息，但需谨记物极必反之理。' },
-  2: { name: '坤为地', symbol: '䷁', judgment: '元亨利牝马之贞', interpretation: '坤卦象征大地，柔顺承载。宜以柔克刚，厚德载物，以包容和耐心应对一切。' },
-  3: { name: '水雷屯', symbol: '䷂', judgment: '元亨利贞，勿用有攸往', interpretation: '屯卦象征万物初生的艰难。创业初期困难重重，需耐心等待时机，不可贸然前行。' },
-  4: { name: '山水蒙', symbol: '䷃', judgment: '亨，匪我求童蒙，童蒙求我', interpretation: '蒙卦代表启蒙、学习。保持谦虚好学的态度，求知若渴，必能开启智慧之门。' },
-  5: { name: '水天需', symbol: '䷄', judgment: '有孚光亨，贞吉，利涉大川', interpretation: '需卦教人等待时机的智慧。耐心等待，保持信心，时机成熟时自可大步向前。' },
-  6: { name: '天水讼', symbol: '䷅', judgment: '有孚窒惕，中吉终凶', interpretation: '讼卦提醒避免纷争。凡事以和为贵，争讼虽可暂时获胜，但终非上策。' },
-  7: { name: '地水师', symbol: '䷆', judgment: '贞丈人吉，无咎', interpretation: '师卦象征军队和集体行动。需要组织和纪律，以正直的领导带领团队前进。' },
-  8: { name: '水地比', symbol: '䷇', judgment: '吉，原筮元永贞，无咎', interpretation: '比卦代表亲密团结。人际关系和谐，适合合作和建立联盟，但要审慎选择伙伴。' },
-  9: { name: '风天小畜', symbol: '䷈', judgment: '亨，密云不雨，自我西郊', interpretation: '小畜卦表示小有积蓄但尚未大成。继续积累力量，静待更大的突破。' },
-  10: { name: '天泽履', symbol: '䷉', judgment: '履虎尾不咥人，亨', interpretation: '履卦教人谨慎前行。即使身处险境，只要小心谨慎，也能化险为夷。' },
-  11: { name: '地天泰', symbol: '䷊', judgment: '小往大来，吉亨', interpretation: '泰卦意味天地交泰，万物通达。运势顺畅，事业顺利发展，但要居安思危。' },
-  12: { name: '天地否', symbol: '䷋', judgment: '否之匪人，不利君子贞', interpretation: '否卦表示天地闭塞不通。运势受阻，宜退守自保，韬光养晦，等待转机。' },
-  13: { name: '天火同人', symbol: '䷌', judgment: '同人于野，亨，利涉大川', interpretation: '同人卦代表同心协力。团结志同道合之人，集众人之力可成大事。' },
-  14: { name: '火天大有', symbol: '䷍', judgment: '元亨', interpretation: '大有卦象征丰收富足。事业昌盛，财富充裕，但需警惕骄奢之心。' },
-  15: { name: '地山谦', symbol: '䷎', judgment: '亨，君子有终', interpretation: '谦卦教人谦虚之道。满招损谦受益，保持谦虚低调，必能善始善终。' },
-  16: { name: '雷地豫', symbol: '䷏', judgment: '利建侯行师', interpretation: '豫卦代表愉悦和顺。适当的放松和享受是必要的，但不可沉溺于享乐。' },
-  17: { name: '泽雷随', symbol: '䷐', judgment: '元亨利贞，无咎', interpretation: '随卦表示随机应变。顺势而为，随遇而安，不必强求，自能得到好的结果。' },
-  18: { name: '山风蛊', symbol: '䷑', judgment: '元亨，利涉大川，先甲三日，后甲三日', interpretation: '蛊卦代表败坏和整顿。发现问题的根源，果断改革，彻底清除积弊。' },
-  19: { name: '地泽临', symbol: '䷒', judgment: '元亨利贞，至于八月有凶', interpretation: '临卦象征亲临视察。时机正在临近，以开放的心态面对即将到来的变化和机遇。' },
-  20: { name: '风地观', symbol: '䷓', judgment: '盥而不荐，有孚颙若', interpretation: '观卦代表观察和反思。退一步以更高的视角审视全局，才能获得深刻的洞见。' },
-  21: { name: '火雷噬嗑', symbol: '䷔', judgment: '亨，利用狱', interpretation: '噬嗑卦表示咬合、决断。面对障碍要果断行动，清除前进道路上的阻碍。' },
-  22: { name: '山火贲', symbol: '䷕', judgment: '亨，小利有攸往', interpretation: '贲卦代表装饰和文化。注重内在修养和外在形象，以文化的力量提升自身魅力。' },
-  23: { name: '山地剥', symbol: '䷖', judgment: '不利有攸往', interpretation: '剥卦象征剥落衰败。阴盛阳衰，根基动摇，宜退守等待，保存实力。' },
-  24: { name: '地雷复', symbol: '䷗', judgment: '亨，出入无疾，朋来无咎', interpretation: '复卦代表回归和复兴。一阳来复，生机重现，之前的阴霾即将散去，新机会正在到来。' },
-  25: { name: '天雷无妄', symbol: '䷘', judgment: '元亨利贞，其匪正有眚', interpretation: '无妄卦教人真诚自然。保持纯粹的本心，不做非分之想，自然万事顺遂。' },
-  26: { name: '山天大畜', symbol: '䷙', judgment: '利贞，不家食吉，利涉大川', interpretation: '大畜卦表示大蓄积。厚积薄发，积蓄实力，准备迎接更大的挑战和机遇。' },
-  27: { name: '山雷颐', symbol: '䷚', judgment: '贞吉，观颐，自求口实', interpretation: '颐卦代表颐养和滋养。注重身心健康，修身养性，自食其力是最好的生活方式。' },
-  28: { name: '泽风大过', symbol: '䷛', judgment: '栋桡，利有攸往，亨', interpretation: '大过卦表示过度和超越。大局面临失衡，需要果断调整，以非常之举应对非常之时。' },
-  29: { name: '坎为水', symbol: '䷜', judgment: '习坎有孚，维心亨，行有尚', interpretation: '坎卦象征重重险阻。身处困境之中，保持内心坚定和诚实，终能化险为夷。' },
-  30: { name: '离为火', symbol: '䷝', judgment: '利贞亨，畜牝牛吉', interpretation: '离卦代表光明和依附。如火焰般温暖明亮，但需有所依附，柔顺守正可得吉祥。' },
-  31: { name: '泽山咸', symbol: '䷞', judgment: '亨利贞，取女吉', interpretation: '咸卦代表感应和情感。心灵相通，情感交融，以真诚之心感应他人和世界。' },
-  32: { name: '雷风恒', symbol: '䷟', judgment: '亨，无咎，利贞，利有攸往', interpretation: '恒卦表示长久和稳定。持之以恒，坚守正道，长期的努力终将获得丰厚的回报。' },
-  33: { name: '天山遁', symbol: '䷠', judgment: '亨，小利贞', interpretation: '遁卦代表退避。形势不利时，适时退避是明智之举，韬光养晦以待来日。' },
-  34: { name: '雷天大壮', symbol: '䷡', judgment: '利贞', interpretation: '大壮卦代表强盛壮大。力量充沛之时，仍要守持正道，不可恃强凌弱。' },
-  35: { name: '火地晋', symbol: '䷢', judgment: '康侯用锡马蕃庶，昼日三接', interpretation: '晋卦象征进步和晋升。事业蒸蒸日上，光明在前，以正直之心获取应得的回报。' },
-  36: { name: '地火明夷', symbol: '䷣', judgment: '利艰贞', interpretation: '明夷卦表示光明受损。黑暗时期，保持内心的光明和正直，在逆境中磨砺自己。' },
-  37: { name: '风火家人', symbol: '䷤', judgment: '利女贞', interpretation: '家人卦关乎家庭和亲情。家和万事兴，关注家庭关系的和谐，各尽其责。' },
-  38: { name: '火泽睽', symbol: '䷥', judgment: '小事吉', interpretation: '睽卦代表分歧和对立。人与人之间存在差异是正常的，求同存异，小处着手可得吉祥。' },
-  39: { name: '水山蹇', symbol: '䷦', judgment: '利西南，不利东北，利见大人', interpretation: '蹇卦表示艰难险阻。前路坎坷，需寻找正确的方向和贵人相助。' },
-  40: { name: '雷水解', symbol: '䷧', judgment: '利西南，无所往，其来复吉', interpretation: '解卦代表解脱和缓解。困难正在消解，不必过多干预，让事情自然恢复。' },
-  41: { name: '山泽损', symbol: '䷨', judgment: '有孚元吉，无咎可贞，利有攸往', interpretation: '损卦教人减损之道。有时少即是多，简化生活，舍弃不必要的负担。' },
-  42: { name: '风雷益', symbol: '䷩', judgment: '利有攸往，利涉大川', interpretation: '益卦代表增益和利益。天时地利人和，事业和财富都在增长，把握良机。' },
-  43: { name: '泽天夬', symbol: '䷪', judgment: '扬于王庭，孚号有厉', interpretation: '夬卦表示决断和分离。当断则断，不受其乱，果断地做出选择和决定。' },
-  44: { name: '天风姤', symbol: '䷫', judgment: '女壮，勿用取女', interpretation: '姤卦代表邂逅和相遇。意外的相遇可能带来重要的变化，保持开放但也要谨慎。' },
-  45: { name: '泽地萃', symbol: '䷬', judgment: '亨，王假有庙，利见大人', interpretation: '萃卦代表聚集和精华。群英荟萃，适合团队合作和集体行动，集中力量办大事。' },
-  46: { name: '地风升', symbol: '䷭', judgment: '元亨，用见大人，勿恤', interpretation: '升卦代表上升和成长。步步高升，事业进入上升期，保持谦逊继续努力。' },
-  47: { name: '泽水困', symbol: '䷮', judgment: '亨贞，大人吉，无咎', interpretation: '困卦表示困境和窘迫。身处困境更要保持乐观和坚守，转机总会来临。' },
-  48: { name: '水风井', symbol: '䷯', judgment: '改邑不改井，无丧无得', interpretation: '井卦代表源泉和滋养。生活的根基不变，持续提供价值，滋养自己和他人。' },
-  49: { name: '泽火革', symbol: '䷰', judgment: '巳日乃孚，元亨利贞，悔亡', interpretation: '革卦代表变革和革新。旧的不去新的不来，顺应时代的变化，主动进行革新。' },
-  50: { name: '火风鼎', symbol: '䷱', judgment: '元吉，亨', interpretation: '鼎卦象征权力和责任。承担重任，以正直和智慧行使职责，成就大事。' },
-  51: { name: '震为雷', symbol: '䷲', judgment: '亨，震来虩虩，笑言哑哑', interpretation: '震卦代表震惊和行动。面对突如其来的变化保持冷静，转危为安后更加从容。' },
-  52: { name: '艮为山', symbol: '䷳', judgment: '艮其背不获其身，行其庭不见其人', interpretation: '艮卦象征停止和静止。知止而后有定，适当停下来反思，不要一味向前冲。' },
-  53: { name: '风山渐', symbol: '䷴', judgment: '女归吉，利贞', interpretation: '渐卦代表渐进和积累。万事不可急于求成，循序渐进，自然而然地达成目标。' },
-  54: { name: '雷泽归妹', symbol: '䷵', judgment: '征凶，无攸利', interpretation: '归妹卦表示结合但需谨慎。选择伴侣或合作伙伴时要格外审慎，不可盲目。' },
-  55: { name: '雷火丰', symbol: '䷶', judgment: '亨，王假之，勿忧，宜日中', interpretation: '丰卦代表丰盛和饱满。处于鼎盛时期，享受丰盈但要知日中则昃的道理。' },
-  56: { name: '火山旅', symbol: '䷷', judgment: '小亨，旅贞吉', interpretation: '旅卦表示旅行和漂泊。人生如旅，在外奔波时要灵活应变，保持谦逊。' },
-  57: { name: '巽为风', symbol: '䷸', judgment: '小亨，利有攸往，利见大人', interpretation: '巽卦代表顺从和渗透。如风般柔和地渗透和影响，以柔克刚，顺势而行。' },
-  58: { name: '兑为泽', symbol: '䷹', judgment: '亨利贞', interpretation: '兑卦象征喜悦和交流。快乐融洽的人际交往，以开放的心态分享和交流。' },
-  59: { name: '风水涣', symbol: '䷺', judgment: '亨，王假有庙，利涉大川', interpretation: '涣卦代表涣散和重新凝聚。离散之后重整旗鼓，将分散的力量重新聚集在一起。' },
-  60: { name: '水泽节', symbol: '䷻', judgment: '亨，苦节不可贞', interpretation: '节卦表示节制和限度。凡事有度，适可而止，过度的克制和放纵都不可取。' },
-  61: { name: '风泽中孚', symbol: '䷼', judgment: '豚鱼吉，利涉大川，利贞', interpretation: '中孚卦代表诚信和信任。以诚待人，信守承诺，真诚是通往一切成功的基石。' },
-  62: { name: '雷山小过', symbol: '䷽', judgment: '亨利贞，可小事不可大事', interpretation: '小过卦表示小有过度。在细节上可以精致讲究，但大方向不要偏离中道。' },
-  63: { name: '水火既济', symbol: '䷾', judgment: '亨小，利贞，初吉终乱', interpretation: '既济卦代表事已成就。目标已经达成，但成功之后需要更加谨慎，不可松懈。' },
-  64: { name: '火水未济', symbol: '䷿', judgment: '亨，小狐汔济濡其尾，无攸利', interpretation: '未济卦表示事业未成。革命尚未成功，同志仍需努力，坚持到最后才是真正的胜利。' },
+  1: { name: '乾为天', symbol: '䷀', judgment: '元亨利贞', interpretation: '乾卦为六十四卦之首，纯阳至刚，象征天道运行、创造与力量。得此卦者，正值奋发有为之时，宜积极进取、自强不息。乾卦六爻以龙为喻，从"潜龙勿用"到"飞龙在天"再到"亢龙有悔"，完整展现事物发展的全过程。当前你的处境正处在上升阶段，但需谨记刚健中正之道——过于刚猛则易折断。建议把握时机勇敢前行，同时保持谦逊与耐心，切忌急功近利。人际交往中宜以诚待人，事业上可大胆开拓，但任何决策都需三思后行。' },
+  2: { name: '坤为地', symbol: '䷁', judgment: '元亨利牝马之贞', interpretation: '坤卦纯阴至柔，象征大地厚德载物、柔顺包容。得此卦者，宜以静制动、以柔克刚。坤卦教导我们"地势坤，君子以厚德载物"——宽广深厚的胸怀是承载一切成就的根基。你当前需要放下急躁和强求，以更温和、更包容的态度面对当前的挑战。有时候"无为"比"有为"更能成事。在人际关系中，多倾听少争辩；在事业上，稳扎稳打胜过冒险激进。你的耐心和包容力将在此时此刻成为最大的力量源泉。' },
+  3: { name: '水雷屯', symbol: '䷂', judgment: '元亨利贞，勿用有攸往', interpretation: '屯卦象征万物初生、创业维艰，如同嫩芽破土而出，充满生命力却也面临重重阻碍。得此卦者，正处于事情的起步阶段，前方有诸多不确定性。屯卦提醒你：万事开头难，此时不宜贸然前行，需耐心等待时机成熟。你内心可能充满焦虑与迷茫，这完全正常。建议先做好充分准备，寻找有经验的人给予指导和帮助。记住，每一棵参天大树都曾是一颗在黑暗中挣扎的种子。坚持信念，时机一到，一切都会豁然开朗。' },
+  4: { name: '山水蒙', symbol: '䷃', judgment: '亨，匪我求童蒙，童蒙求我', interpretation: '蒙卦代表启蒙求学、增长智慧的阶段。山上有水，雾气朦胧，如同心智尚未明朗的状态。得此卦者，正处在一个需要学习和成长的时期。你可能会感到困惑或迷茫，但这正是开启智慧之门的契机。蒙卦教导我们：真正的学习需要发自内心的渴望，而非被动接受。建议你保持谦虚好学的态度，主动向有智慧的人请教。去除浮躁之心，静下心来深入钻研，必能在迷雾中找到属于自己那条清晰的道路。' },
+  5: { name: '水天需', symbol: '䷄', judgment: '有孚光亨，贞吉，利涉大川', interpretation: '需卦教人"等待"的智慧。云在天上，雨未落下，时机尚未成熟。得此卦者，当前最重要的事情不是行动，而是耐心等待。你的计划和愿望可能需要比预期更长的时间来实现，但这并非坏事——在等待中，你可以更充分地准备自己。就像农民播种后不会每天挖开土壤检查种子，而是浇水施肥耐心等待。建议你保持信心，利用这段时间充实自己、完善计划。当时机来临，你会发现自己已经做好了万全的准备，可以"利涉大川"，顺利跨越任何困难。' },
+  6: { name: '天水讼', symbol: '䷅', judgment: '有孚窒惕，中吉终凶', interpretation: '讼卦提醒避免纷争与官司。天向上水向下，二者方向相反，象征矛盾和对立。得此卦者，可能正面临人际冲突或利益纠纷。易经告诫我们：即使争讼能暂时获胜，最终也往往两败俱伤。真正有智慧的人懂得在矛盾激化前化解冲突。建议你退一步审视当前的矛盾——有些"输赢"根本不值得你投入时间和情绪。以和为贵，寻求双方都能接受的妥协方案。如果已经深陷纷争，尽早抽身，不要因小失大。' },
+  7: { name: '地水师', symbol: '䷆', judgment: '贞丈人吉，无咎', interpretation: '师卦象征军队和集体行动，代表组织、纪律和领导力。得此卦者，可能正面临需要组织和协调众人的局面。师卦强调"以正治军"——团队的成功取决于领导者的正直品格和清晰方向。你需要像一位明智的将领一样思考：目标是否明确？团队是否齐心？策略是否周全？建议你现在就确立清晰的规则和分工，以身作则，用正直和公正赢得他人的信任。一个好的领导者不是独裁者，而是能够凝聚众人力量、朝向共同目标的人。' },
+  8: { name: '水地比', symbol: '䷇', judgment: '吉，原筮元永贞，无咎', interpretation: '比卦代表亲密无间、团结协作。水在地上流淌，相互依附渗透。得此卦者，人际关系将成为你近期运势的关键。比卦鼓励你主动建立联系、寻求合作。你可能正在人际关系中寻求归属感，或是需要找到志同道合的伙伴。建议你打开心扉，积极参与社交活动，但也要注意审慎选择伙伴——"比之匪人"不如不比。真正的合作建立在相互信任和共同价值观的基础上。在感情方面，此卦预示着亲密关系的加深；在事业上，团队合作将带来超出预期的成果。' },
+  9: { name: '风天小畜', symbol: '䷈', judgment: '亨，密云不雨，自我西郊', interpretation: '小畜卦表示"小有积蓄但尚未大成"，就像乌云密布却还下不了雨——力量正在积聚，但还差最后一步。得此卦者，你的努力已经开始显现成果，但还远未到达收获的时候。这既是一个好消息——说明方向正确，也是一个提醒——不要急于求成。小畜卦建议你继续积累，无论是知识、财富还是人脉，当下的每一分投入都会在将来产生回报。在感情中，可能需要更多的耐心来培养关系；在事业上，小步快跑比大跃进更加稳妥。' },
+  10: { name: '天泽履', symbol: '䷉', judgment: '履虎尾不咥人，亨', interpretation: '履卦以"踩到老虎尾巴而老虎不咬人"为喻，形象地描述了身处险境却安然无恙的状态。得此卦者，可能正在处理一些敏感或危险的事务。但不必过于担忧——只要小心谨慎、言行得体，就能化险为夷。履卦的核心教导是：面对强者或危险时，保持恭敬和谨慎的态度至关重要。建议你在重要场合谨言慎行，尊重规则和权威。有些路看起来危险，但只要你每一步都走得踏实，最终会平安抵达目的地。' },
+  11: { name: '地天泰', symbol: '䷊', judgment: '小往大来，吉亨', interpretation: '泰卦是天地交泰、万物通达的吉兆。地在天上，阴阳和谐交融，象征一切通达顺畅。得此卦者，当前运势正处于上升期！事业、感情、财运各方面都将迎来令人满意的进展。然而泰卦也隐含着"居安思危"的深意——正因一切顺利，才更要保持清醒和谦逊。盛极必衰是自然规律，你现在最需要做的是：在顺境中为未来做好规划，稳固现有的基础，善待身边的人。记住，真正的智慧不仅在于抓住机遇，更在于为风云变幻的未来做好准备。' },
+  12: { name: '天地否', symbol: '䷋', judgment: '否之匪人，不利君子贞', interpretation: '否卦与泰卦相反，天地闭塞不通，上下隔绝。得此卦者，当前运势受阻，可能感到诸事不顺、沟通困难。这是一个需要"韬光养晦"的时期。否卦告诉我们：逆境是暂时的，但强行突破往往适得其反。此时宜退守自保，保存实力，而不是逆势而来。建议你降低期望值，减少不必要的社交和支出，把精力集中在自我提升和内在修炼上。在黑暗中守住自己的光芒，等待否极泰来的那一天。历史上许多伟人都在"否"境中修炼出了日后的辉煌。' },
+  13: { name: '天火同人', symbol: '䷌', judgment: '同人于野，亨，利涉大川', interpretation: '同人卦代表志同道合、同心协力。天与火皆光明向上，象征志趣相投的人们聚集在一起。得此卦者，现在是寻找同路人的最佳时机。你可能有一个远大的目标或理想，单靠一人之力难以完成，需要找到有共同愿景的伙伴。同人卦建议你走出日常的圈子，在更广阔的天地中寻找支持者。真诚和坦诚是吸引对的人的关键。无论是在创业中寻找合伙人，还是在生活中寻找知己，保持开放和真诚的态度，志同道合的人自然会被你吸引。' },
+  14: { name: '火天大有', symbol: '䷍', judgment: '元亨', interpretation: '大有卦象征大丰收、硕果累累。火在天上，光明普照万物，一切都清晰明亮。得此卦者，你正处在收获的季节！过去的付出开始显现回报，事业昌盛、财富充裕。然而大有卦提醒我们：丰收之时更要保持清醒。财富和成功容易让人骄奢，而骄奢是衰败的开始。建议你在享受成果的同时，心怀感恩，与身边的人分享你的成功。慷慨和谦逊会让你的好运长久持续。同时也要注意，现在不是躺在功劳簿上休息的时候，继续前行才能守住已有的成就。' },
+  15: { name: '地山谦', symbol: '䷎', judgment: '亨，君子有终', interpretation: '谦卦教导谦虚之道——山在地下，高大却不显露。得此卦者，无论你有多大的才华和成就，现在最适宜的态度是保持低调。满招损、谦受益是千古不变的真理。你的能力和价值不需要通过张扬来证明，真正的强者如高山般沉稳内敛。谦卦预示着一个好的结果——只要你能保持谦虚谨慎，事情就能善始善终。建议你在言语和行动上都留有余地，多听少说，把功劳让给别人。这种看似退让的姿态，实际上会为你赢得更多的尊重和信任。' },
+  16: { name: '雷地豫', symbol: '䷏', judgment: '利建侯行师', interpretation: '豫卦代表愉悦和顺、安逸享乐。雷出地上，万物欣欣向荣，一片欢欣鼓舞的景象。得此卦者，这是一个享受生活、犒劳自己的好时机。适度的放松和享乐不仅无害，反而能为未来的奋斗积蓄能量。但豫卦也隐含着警示：沉溺于安逸会消磨意志。建议你在享受当下的同时保持自律，不要因为一时的快乐而忘记长远的目标。就像一场好的音乐会，既有高潮也有平缓，欢乐过后，记得回到主旋律。生活需要平衡，既要努力工作，也要懂得犒赏自己。' },
+  17: { name: '泽雷随', symbol: '䷐', judgment: '元亨利贞，无咎', interpretation: '随卦表示随机应变、顺势而为。泽中有雷，雷声随泽水而回荡，一切自然而然。得此卦者，最佳策略是"随遇而安"——不必强求，不必抗拒，跟随自然的节奏前行。你可能正在纠结某件事该如何决策，随卦的建议是：暂时放下执念，看看事情自然发展的方向。有时候，最好的行动就是不刻意行动。在人际关系中，以柔和的态度顺应他人；在工作中，灵活调整策略而非固守原计划。当你能随顺因缘时，一切都会水到渠成。' },
+  18: { name: '山风蛊', symbol: '䷑', judgment: '元亨，利涉大川，先甲三日，后甲三日', interpretation: '蛊卦代表积弊与整顿。山下有风，风被山阻而滋生腐败，暗示长期积累的问题需要被正视。得此卦者，可能某些事情已经腐烂变质到了不得不处理的地步。这是一个需要勇气和决断的时刻——面对问题的根源，果断进行改革。蛊卦告诉我们，"先甲三日，后甲三日"，改革需要充分准备和持续跟进。建议你诚实面对生活中需要清理的部分：可能是一段不健康的关系，一个错误的习惯，或是工作中长期存在的弊端。彻底的清理会为新生腾出空间。' },
+  19: { name: '地泽临', symbol: '䷒', judgment: '元亨利贞，至于八月有凶', interpretation: '临卦象征亲临视察、时机临近。地在泽上，居高临下，一览无余。得此卦者，一个重要的事件或转折点正在临近。你需要用更开放和积极的心态去面对即将到来的变化。临卦教导我们：面对机遇时要亲自参与和体验，而非旁观。建议你主动走上前，近距离观察和了解情况。同时临卦也提醒"至于八月有凶"——所有美好的机遇都有时效性，错过了最佳时机就会转吉为凶。抓住当下，不要犹豫，但也要为可能的挑战做好准备。' },
+  20: { name: '风地观', symbol: '䷓', judgment: '盥而不荐，有孚颙若', interpretation: '观卦代表观察与反思。风行地上，遍览万物。得此卦者，现在不是行动的时候，而是退后一步、以更高视角观察全局的时候。就像站在山顶俯瞰山谷，你会发现之前置身其中时看不到的路径和风景。观卦建议你暂时放下手头的琐事，给自己一些独处和反思的时间。审视自己的内心——你真正想要的是什么？你现在走的方向对吗？同时也要观察外部环境的变化趋势，从中寻找到属于自己的机遇。深度洞察会带来比盲目行动好得多的结果。' },
+  21: { name: '火雷噬嗑', symbol: '䷔', judgment: '亨，利用狱', interpretation: '噬嗑卦表示咬合与决断。火在雷上，闪电照亮黑暗，让隐藏的事物无所遁形。得此卦者，你正面临一个需要果断决策的局面。口中有物，必须用力咬碎才能合拢——这意味着你必须直面障碍，而非绕道而行。噬嗑卦的能量是强劲而果断的，鼓励你拿出勇气，清除前进道路上的阻碍。可能是一段纠缠不清的关系、一个拖延已久的决定、或是一个需要被纠正的错误。不要犹豫，果断出手！正义和真相站在你这一边。' },
+  22: { name: '山火贲', symbol: '䷕', judgment: '亨，小利有攸往', interpretation: '贲卦代表文饰与美化。山下有火，火光映照山体，显现出美丽的色彩。得此卦者，现在适合提升自己的内在修养和外在形象。贲卦提醒我们：适当的包装和表达是必要的，但不要过度追求表面的华丽而忽视实质内容。你可能会在近期关注自己的仪表、家居环境或社交形象——合理的关注是好事，但不必过度焦虑于他人的眼光。在职场中，学会恰当地展示自己的成果；在感情中，用心经营浪漫和仪式感。记住，最好的装饰是由内而外散发的光芒。' },
+  23: { name: '山地剥', symbol: '䷖', judgment: '不利有攸往', interpretation: '剥卦象征层层剥落、根基动摇。山在地上，但山体开始剥落崩塌。得此卦者，你赖以立足的基础可能正在被侵蚀——也许是职位的稳定性、一段关系的安全感，或是身心健康的下降。这是一个需要高度警觉的时刻，不宜轻举妄动。剥卦教导我们：当衰败的趋势已经开始时，最明智的做法是退守和保存实力。像冬天的大树一样，脱去所有的叶子，将能量保存在根部，等待春天的到来。建议你不要在此时做重大投资或决策，先把精力放在保护自己已有的资源上。' },
+  24: { name: '地雷复', symbol: '䷗', judgment: '亨，出入无疾，朋来无咎', interpretation: '复卦是希望之卦——一阳来复，生机重现！漫长的寒冬之后，第一缕阳光重新照耀大地。得此卦者，好运正在回归，之前的阴霾即将散去。你可能会在近期感受到一种新的能量和希望——一个被搁置的计划重新启动，一段冷却的关系回暖，或是身体和心情的全面复苏。复卦鼓励你以开放和积极的心态迎接这一轮新的机遇。之前的挫折和等待都是有意义的，它们让你更加坚韧和清晰。现在，迈出你通向新阶段的第一步吧！' },
+  25: { name: '天雷无妄', symbol: '䷘', judgment: '元亨利贞，其匪正有眚', interpretation: '无妄卦教导我们保持真诚和自然的状态。天下雷行，万物不敢妄为。得此卦者，最好的策略是回归本心，保持真实和自然。不要刻意追求不属于你的东西，不要因为贪婪或虚荣而偏离正道。无妄即"不妄为"——顺其自然反而能得到最好的结果。建议你检视自己的动机：你是否在做某件事时掺杂了太多功利心？你是否在关系中伪装自己？放下这些不必要的执念和伪装，以真实的面目面对世界，你会发现一切变得轻松而顺利。' },
+  26: { name: '山天大畜', symbol: '䷙', judgment: '利贞，不家食吉，利涉大川', interpretation: '大畜卦代表深厚的积蓄和准备。天在山中，蕴藏着巨大的力量。得此卦者，你正在积累阶段——如同水库蓄水，看似平静无事，实则力量在暗中增长。现在不是急于求成的时刻，而是厚积薄发的前夜。你在知识、技能、财富或人际关系上的每一分投入，都是在为未来的大作为做准备。大畜卦建议你利用当下的时间深度学习、广泛阅读、积累经验。门外有广阔的天地等着你，但能否"利涉大川"取决于你准备得是否充分。' },
+  27: { name: '山雷颐', symbol: '䷚', judgment: '贞吉，观颐，自求口实', interpretation: '颐卦关乎颐养和滋养——既包括身体的营养，也包括精神世界的充实。山下有雷，万物得到滋养而生长。得此卦者，现在需要关注自己的身心健康。你是否在过度消耗自己？是否忽视了饮食、睡眠和休息？颐卦建议你暂停忙碌，好好照顾自己的身体和心灵。同时，"自求口实"强调独立自主——依靠自己的努力获取生活所需，而非依赖他人。在精神和物质上都实现自给自足，这是颐卦最深刻的智慧。养精蓄锐之后，你才能更好地迎接挑战。' },
+  28: { name: '泽风大过', symbol: '䷛', judgment: '栋桡，利有攸往，亨', interpretation: '大过卦表示超出常规、"过度"的状态。泽灭木，大水淹过了树木，局面超出了常态。得此卦者，当前局势已经超出了常规能够处理的范围，需要以"非常之举"应对"非常之时"。也许你正在经历前所未有的压力，也许某个事情完全偏离了正常轨道。大过卦虽然险峻，但"利有攸往"——敢于突破常规反而能获得成功。建议你拿出破釜沉舟的勇气，不被传统的思维框架所限制。有时候，正是那些"不合常规"的选择，成就了人生的重大转折。' },
+  29: { name: '坎为水', symbol: '䷜', judgment: '习坎有孚，维心亨，行有尚', interpretation: '坎卦象征重重险阻，一坎刚过一坎又来，如同陷入深水之中。得此卦者，可能正身处困境或低谷期。但坎卦并非纯粹的凶卦——"维心亨"意味着只要内心保持坚定和诚实，就能在险境中找到出路。水虽深，但水能载舟亦能覆舟——关键在于你如何与之相处。建议你不要在恐惧中挣扎，而是像水一样灵活应对。学会与困难共处，在逆境中磨砺自己的品格。每一次穿越"坎"的经历，都会让你变得更加强大和睿智。' },
+  30: { name: '离为火', symbol: '䷝', judgment: '利贞亨，畜牝牛吉', interpretation: '离卦代表光明、温暖与依附。双火相叠，光芒四射。得此卦者，你的智慧和热情正在发光，但也需要有所依附才能持久——如同火焰需要燃料。离卦教导我们"柔顺守正"的智慧：光明是美好的，但不能过于耀眼而灼伤他人。建议你在展现才华的同时保持柔和的态度。在人际关系中，做一个温暖但不刺眼的存在；在事业上，让你的专业能力自然发光，而非刻意炫耀。同时，"畜牝牛吉"提醒你要像温顺的母牛一样踏实耕耘。' },
+  31: { name: '泽山咸', symbol: '䷞', judgment: '亨利贞，取女吉', interpretation: '咸卦代表心灵感应与情感交融。山上有泽，山泽通气，相互感应。得此卦者，现在是你打开心扉、建立情感连接的时候了。咸卦描述了人与人之间那种无需言语的微妙感应——一个眼神、一次触碰就能传达深意。在爱情中，这是两情相悦的美好时刻；在友情中，你会感受到真正的默契和理解。建议你放下防备，真诚地感受和表达情感。爱的能量正在流动，不要用过多的理性去分析和克制。让你的直觉和感受引导你走向更深层的人际连接。' },
+  32: { name: '雷风恒', symbol: '䷟', judgment: '亨，无咎，利贞，利有攸往', interpretation: '恒卦代表持久和恒常。雷与风相随，始终不变。得此卦者，这个阶段最重要的是"坚持"二字。你可能已经在一件事情上投入了很久，现在正在接近量变到质变的临界点。恒卦告诉你：只要方向正确，坚持下去就是胜利。任何事情最困难的不是开始，而是中途放弃。建议你回顾一下最初的目标和初心——它们依然值得你为之奋斗吗？如果是，那就咬紧牙关继续走下去。恒久的力量如同滴水穿石，看似缓慢，实则势不可挡。' },
+  33: { name: '天山遁', symbol: '䷠', judgment: '亨，小利贞', interpretation: '遁卦代表退避和隐退。天下有山，山高而天更远，象征君子远离小人。得此卦者，当前形势不利于正面硬碰——明智的选择是暂时退避，保存自己的实力和清白。遁卦并非建议你永远逃避，而是教你"以退为进"的智慧。在职场中，如果环境不友善，考虑换个平台；在人际关系中，与消耗你的人保持距离也是一种自爱。真正的强者知道什么时候该战斗，更知道什么时候该撤退。眼下的小退一步，将为日后的大进一步积蓄力量。' },
+  34: { name: '雷天大壮', symbol: '䷡', judgment: '利贞', interpretation: '大壮卦代表力量的鼎盛时期。雷在天上，声势浩大，威力无穷。得此卦者，你现在处于力量充沛的人生阶段——精力旺盛、信心满满、影响力强大。这是一个适合大展拳脚的时期。但大壮卦也隐含警示：力量越大，责任越大。恃强凌弱是衰败的开始。建议你善用当下的能量和影响力，为自己和他人创造价值。在得意时保持一份清醒和谦逊，不因一时的强大而忘乎所以。记住，真正的力量不是征服别人，而是战胜自己的傲慢。' },
+  35: { name: '火地晋', symbol: '䷢', judgment: '康侯用锡马蕃庶，昼日三接', interpretation: '晋卦象征进步与升迁。日出大地，光明渐升。得此卦者，你的事业和生活正在一个上升通道中。此卦描述了一个人因为德才兼备而得到上级赏识和重用的场景——"昼日三接"意味着频繁获得嘉奖和新的机会。这对你来说是一个好消息：你的努力正在被看到，晋升和进步指日可待。但晋卦也提醒你，地位的提升伴随着责任的增加。以正直和勤奋来匹配你的新位置，不要辜负他人的信任。这是一个难得的上升期，好好把握！' },
+  36: { name: '地火明夷', symbol: '䷣', judgment: '利艰贞', interpretation: '明夷卦表示光明被遮蔽的黑暗时期。太阳入地，光芒虽在却被大地掩盖。得此卦者，你可能正身处一个不被理解、才华被埋没的阶段。好人不得志、正确的意见被忽视——这种感觉确实令人沮丧。但明夷卦教导我们：即使在最黑暗的时刻，也要守住内心的光明。如同地下之火，虽然不可见，但温度依然存在。建议你在逆境中保护好自己内心的火焰——你的价值观、你的信念、你的才华。不要在黑暗中同流合污，保持正直和清醒。黎明终将到来。' },
+  37: { name: '风火家人', symbol: '䷤', judgment: '利女贞', interpretation: '家人卦关乎家庭和睦与亲情。风从火出，一家人围炉而坐的温暖场景。得此卦者，家庭和内部关系将成为你最近关注的重点。一个和谐的家庭（或团队内部关系）是你在外部世界拼搏的坚实后盾。家人卦建议每个成员各尽其责——父慈子孝、兄友弟恭，各自扮演好自己的角色。如果你正经历家庭矛盾，此卦提醒你：家是讲爱的地方，不是讲理的地方。多一些理解和包容，少一些指责和要求。修复和家人的关系，会让你的整个生活都变得更加美好。' },
+  38: { name: '火泽睽', symbol: '䷥', judgment: '小事吉', interpretation: '睽卦代表分歧和对立。火向上而泽向下，二者方向相反而产生张力。得此卦者，你和他人之间可能存在观点上的差异甚至冲突。这是完全正常的——每个人都是独特的个体。睽卦的智慧在于"小事吉"：在大方向上不必强求一致，但在具体的小事上可以找到共同点。建议你接受人与人之间的差异，不强求所有人都认同你。与不同意见的人找到小而具体的合作点，比空谈理念上的统一要实际得多。求同存异是成年人最高级的智慧。' },
+  39: { name: '水山蹇', symbol: '䷦', judgment: '利西南，不利东北，利见大人', interpretation: '蹇卦表示前路艰难、举步维艰。山上有水，路险水深。得此卦者，你前进的道路上可能有较大的障碍。也许是一个棘手的问题、一个强大的对手、或是一个复杂的局面。蹇卦建议不要强行突破——"利西南，不利东北"意味着你需要选择阻力最小的方向前进。同时"利见大人"提示你可以寻求贵人的帮助。承认自己需要帮助不是软弱，而是智慧。找到正确的方向和能帮助你的人，比一个人孤独地攻坚克难更加高效。' },
+  40: { name: '雷水解', symbol: '䷧', judgment: '利西南，无所往，其来复吉', interpretation: '解卦代表困难的缓解和问题的解决。雷雨大作之后，天空放晴，万物焕然一新。得此卦者，好消息是——困扰你已久的问题正在松动，压力即将释放。解卦建议"无所往"——暂时不要急着去任何地方或做任何重大决定。让事情自然而然地恢复和好转，你不需要做太多干预。就像一个伤口需要时间愈合一样，当前的局面也需要一些时间来自然舒缓。给自己放个假，做一些让你放松的事。困难和痛苦都是暂时的，轻松和解脱正在来的路上。' },
+  41: { name: '山泽损', symbol: '䷨', judgment: '有孚元吉，无咎可贞，利有攸往', interpretation: '损卦教人"减法"的智慧。山下有泽，山被泽水侵蚀而减损，但这减损本身有其意义。得此卦者，你可能需要放弃某些东西——一段不再适合的关系、一个不再有价值的习惯、或是过度的物欲追求。减少不必要的负担，你的脚步反而会更轻快。损卦看似讲"损失"，实则是"增益"的前奏。就像修剪树木会让它长得更好一样，适当的舍弃会为你的人生带来更大的空间和可能性。当你勇敢地说"不"时，你其实在为更重要的东西说"是"。' },
+  42: { name: '风雷益', symbol: '䷩', judgment: '利有攸往，利涉大川', interpretation: '益卦是"增益"之卦，与损卦相对。风雷相激，相互增益壮大。得此卦者，现在正是推动计划、扩大影响的好时机。天时地利人和，外部环境对你的发展十分有利。你可能会收到意想不到的好消息，或是获得超预期的支持和资源。益卦鼓励你把握当下这个"增长窗口"，大胆布局，积极推进。但要注意：增益不仅是对自己，也意味着你有能力去帮助和滋养他人。分享你的好运势，让身边的人也因你而受益。这种良性的循环会让你的幸运持续更久。' },
+  43: { name: '泽天夬', symbol: '䷪', judgment: '扬于王庭，孚号有厉', interpretation: '夬卦表示决断和了断。泽在天上，水满则溢，需要决堤放水。得此卦者，你正面临一个必须做出选择的时刻。有些问题已经到了非解决不可的地步——拖延只会让情况变得更糟。夬卦的能量是果断和明快的，鼓励你拿出勇气做出那个一直回避的决定。也许是结束一段消耗你的关系，也许是辞去一份没有前途的工作，也许是彻底告别一个坏习惯。"当断则断，不受其乱"。做出这个决定后，你会感到前所未有的轻松和自由。' },
+  44: { name: '天风姤', symbol: '䷫', judgment: '女壮，勿用取女', interpretation: '姤卦代表不期而遇，邂逅相逢。天下有风，风行天下而遇万物。得此卦者，一次意外的相遇可能会给你的生活带来重要变化——可能是一位新朋友、一个潜在的伴侣、或是一个意想不到的机会。姤卦提醒我们在偶然中保持警觉——不是所有的相遇都是美好的，有些看似美好的邂逅可能暗藏危机（"女壮，勿用取女"）。建议你以开放的心态迎接新的人和事，但同时保留一份理智和判断力。命运的安排往往是意想不到的，保持敏锐但不失谨慎。' },
+  45: { name: '泽地萃', symbol: '䷬', judgment: '亨，王假有庙，利见大人', interpretation: '萃卦代表群英聚集。泽在地上，水流汇聚于一处。得此卦者，现在是集合力量、汇聚资源的时候。单丝不成线，独木不成林——你的成功需要他人的力量。萃卦鼓励你把志同道合的人聚集在一起，无论是组建团队、召集会议还是组织活动。众人的力量远大于个人，"群策群力"是当下最佳策略。同时"利见大人"意味着你可能会在集体中遇到对你影响深远的贵人。积极参与集体活动，你的下一个重要机遇就藏在那里。' },
+  46: { name: '地风升', symbol: '䷭', judgment: '元亨，用见大人，勿恤', interpretation: '升卦象征步步高升。木在地下生长，破土而出，逐渐高大。得此卦者，你正处于上升通道中——可能是职位提升、学业进步或个人成长。升卦是一个积极的信号：你的努力正在产生可见的成果。但升卦也提醒我们：成长不是一蹴而就的，而是日积月累的过程。像树木一样，根深才能叶茂。建议你在向上发展的同时不忘夯实基础，保持谦虚进取的态度。你可能会遇到赏识你的"大人"（上级或导师），他们的提携将加速你的成长。' },
+  47: { name: '泽水困', symbol: '䷮', judgment: '亨贞，大人吉，无咎', interpretation: '困卦代表陷入困境、四面楚歌。泽中无水，枯竭干涸。得此卦者，你可能正感到资源匮乏、进退两难。有趣的是，困卦的判词却是"亨贞"——在困境中坚守正道反而能通达。这告诉我们一个深刻的真理：困境往往是我们最好的老师。在贫穷中学会珍惜，在孤独中认识自己，在失败中获得智慧。建议你不要急于摆脱困境，而是静下心来问自己：这个困境想教会我什么？有智慧的人（"大人"）能转困境为道场，化烦恼为菩提。' },
+  48: { name: '水风井', symbol: '䷯', judgment: '改邑不改井，无丧无得', interpretation: '井卦象征生命之源、持续滋养。木上有水，井水汩汩而出。得此卦者，井卦启发我们思考何为生命中真正重要的事物。城镇可以变迁，但井水始终在那里——你的核心价值观和内在力量也是如此。外界环境在变化，但你的内核不应轻易动摇。无论你正在经历什么，都不要忘记自己是谁、你最重要的是什么。建议你找到自己的那口"井"——那个持续给你力量和滋养的源泉。可能是你的家庭、你的信仰、你的艺术或你热爱的事业。守护好它，它会滋养你的一生。' },
+  49: { name: '泽火革', symbol: '䷰', judgment: '巳日乃孚，元亨利贞，悔亡', interpretation: '革卦代表变革和革命。泽中有火，水火相济而产生变化。得此卦者，你的生活需要一场深刻的变革。旧的习惯、旧的关系、旧的思维模式已经不再适合现在的你。变革虽然令人不安，却也是成长的必经之路。革卦强调"巳日乃孚"——变革需要时间的检验才能获得认可。不要期望一夜之间完成转变，给自己足够的时间适应新的状态。建议你从最迫切需要改变的地方开始，一步步来。当你回顾这段变革期时，不会后悔——"悔亡"，所有的遗憾都将消散。' },
+  50: { name: '火风鼎', symbol: '䷱', judgment: '元吉，亨', interpretation: '鼎卦以古代烹煮食物的大鼎为象，象征权力、责任和成就大事。火在木上，鼎中食物被烹煮成熟。得此卦者，你即将或已经被授予一个重要的责任——一个团队、一个项目、或是一个家庭的支柱角色。鼎卦是一个非常吉祥的卦："元吉，亨"——从开始就吉祥顺利。但权力和责任也意味着压力。鼎需要足够坚固才能承载食物，你也需要足够强大的内心来承担重任。建议你以正直和智慧来行使你的职责，不要辜负信任你的人。' },
+  51: { name: '震为雷', symbol: '䷲', judgment: '亨，震来虩虩，笑言哑哑', interpretation: '震卦代表突如其来的震惊和变动。雷声轰隆，令人心惊胆战。得此卦者，你可能会遭遇突发事件——一个意外的消息、一个措手不及的变化。震卦生动地描绘了人面对突发状况的反应：先是恐惧（"震来虩虩"），然后镇定下来（"笑言哑哑"）。这告诉我们：面对意外的第一反应是害怕是正常的，但冷静下来之后你会发现事情并没有那么可怕。建议你在动荡中保持冷静的头脑，不要被最初的情绪冲昏头脑。雷声再大，终会平息。' },
+  52: { name: '艮为山', symbol: '䷳', judgment: '艮其背不获其身，行其庭不见其人', interpretation: '艮卦代表"止"的智慧——知道何时停下来。两山相叠，巍然不动。得此卦者，你应该暂停前进了。现代社会充满了"更多、更快、更好"的焦虑，但艮卦告诉我们：有时候停下比前进更需要勇气和智慧。当你停下来，你才能真正看到自己在哪里、要去哪里。建议你减少不必要的社交和活动，给自己一些安静的时间。冥想、散步、写日记——任何一种让你静下来的方式都是好的。在静止中，你会发现很多在忙碌中错过的真相。' },
+  53: { name: '风山渐', symbol: '䷴', judgment: '女归吉，利贞', interpretation: '渐卦代表循序渐进、水到渠成。山上有木，树木在山上缓慢生长。得此卦者，万事不可急于求成，需要给予足够的时间和耐心。就像一棵树不会在一夜之间长成参天大树，你的目标和愿望也需要时间来慢慢实现。渐卦以女子出嫁为喻——婚姻需要遵循礼仪程序，不能仓促。这对你的启示是：按照自然的节奏来推进事情，不要拔苗助长。在感情中，让关系自然发展；在事业上，一步一个脚印。慢即是快，稳就是赢。' },
+  54: { name: '雷泽归妹', symbol: '䷵', judgment: '征凶，无攸利', interpretation: '归妹卦以"嫁女"为象，讨论结合与匹配的问题。雷在泽上，动静不协调。得此卦者，在选择伴侣或合作伙伴时需要特别谨慎。"征凶，无攸利"是少有的严厉警告：仓促的结合会带来不好的后果。也许你正面临一个重要的合作或关系选择，归妹卦建议你慢下来，仔细评估双方的匹配度。价值观是否一致？目标是否兼容？不要因为一时的情感冲动或外部压力而做出草率的决定。好的结合需要在对的时间遇到对的人。' },
+  55: { name: '雷火丰', symbol: '䷶', judgment: '亨，王假之，勿忧，宜日中', interpretation: '丰卦代表极致的丰盛和饱满。雷电交加、火光满天，能量达到顶峰。得此卦者，你正经历人生中的鼎盛时期——才华充分展现、资源充沛、机会不断。丰卦是一个吉兆，但其中也暗含"日中则昃"的提醒：太阳到了正午之后必定西斜。在享受丰盛的同时，要为将来的可能衰退做好准备。建议你利用当下的好运势为未来布局：储蓄、投资自己、建立持久的合作关系。最聪明的做法是在晴天修屋顶，在丰收时储备粮食。' },
+  56: { name: '火山旅', symbol: '䷷', judgment: '小亨，旅贞吉', interpretation: '旅卦象征旅行和客居。山上有火，旅人在外，篝火取暖。得此卦者，你可能正在经历一段"客居"的状态——无论是实际的旅行出差，还是心理上的漂泊感。旅卦提醒我们：人生本来就是一场旅程，我们都是过客。在陌生的环境中，需要更多的灵活性和适应性。建议你以开放和学习的心态面对新环境、新文化或新的人际圈子。旅行不仅开阔眼界，也让你更深刻地认识自己。同时记住，在外要谦逊低调——"旅贞吉"，只有保持端正才能获得吉祥。' },
+  57: { name: '巽为风', symbol: '䷸', judgment: '小亨，利有攸往，利见大人', interpretation: '巽卦代表顺从和渗透。风随风，无孔不入。得此卦者，以柔克刚是当下最佳策略。风虽然无形无色，但能渗透到任何角落，持续不断地影响和改变。你不需要用强硬的方式去达到目的，温和和持续的渗透同样有效，甚至更加深远。巽卦建议你在人际关系中以柔和的态度去沟通，在事业上以持续的努力去积累。如同春风化雨，润物无声——你的影响力在不知不觉中就会扩散开来。"利见大人"意味着你可能会遇到赏识你温柔力量的人。' },
+  58: { name: '兑为泽', symbol: '䷹', judgment: '亨利贞', interpretation: '兑卦象征喜悦和交流。两泽相连，相互滋润。得此卦者，现在是享受人际交往、分享快乐的好时光。兑卦的能量是轻松愉快的——适合聚会、交谈、庆祝。你可能会在近期收到一个好消息，或是参加一次特别愉快的社交活动。建议你放下工作的压力，花时间和朋友、家人在一起。快乐是会传染的，你的笑容会照亮身边的人。在感情方面，这是一个表达爱意的好时机；在事业方面，轻松的沟通方式比严肃的谈判更能打动人心。' },
+  59: { name: '风水涣', symbol: '䷺', judgment: '亨，王假有庙，利涉大川', interpretation: '涣卦代表离散后的重新凝聚。风行水上，水波散开又聚拢。得此卦者，你生活中某些分散的部分正在重新整合。可能是一个解散的团队重组、疏远的关系回暖、或是思绪从混乱变得清晰。涣卦的力量在于"重新凝聚"——旧的形式解体了，但新的、更好的结构正在形成。正如"王假有庙"所暗示的，人们聚集在神圣的空间中重新建立连接。建议你不要抗拒变化和离散，它们是重组的前奏。如果你能主动把分散的力量重新聚合起来，就能"利涉大川"。' },
+  60: { name: '水泽节', symbol: '䷻', judgment: '亨，苦节不可贞', interpretation: '节卦教导"节制"与"限度"。泽上有水，水量需要控制。得此卦者，你需要检视生活中"度"的问题——凡事过犹不及。节卦的精髓在于"适可而止"：努力是好的，但过度劳累会损害健康；节俭是美德，但过分吝啬会失去生活的乐趣；爱是珍贵的，但过度依赖会令人窒息。但节卦也提醒"苦节不可贞"——过于严苛的节制同样不可取。建议你在放纵和禁欲之间找到那个舒服的平衡点。中庸之道才是长久之计。' },
+  61: { name: '风泽中孚', symbol: '䷼', judgment: '豚鱼吉，利涉大川，利贞', interpretation: '中孚卦代表诚信和信任。风在泽上，风行水上，至诚不息。得此卦者，诚信是你当前最重要的法宝。"中孚"意为内心的真诚——当你对自己的内心诚实，对他人的承诺守信时，即使是最简单的"豚鱼"之礼也能获得吉祥。你正在建立或维护的重要关系（商业合作、亲密关系、友谊）需要以诚相待。信任一旦建立，很多事情都会迎刃而解。建议你以最真诚的态度面对自己和他人，不欺骗、不隐瞒、不违背自己的承诺。真诚是最简单的，也是最强大的力量。' },
+  62: { name: '雷山小过', symbol: '䷽', judgment: '亨利贞，可小事不可大事', interpretation: '小过卦表示"小有过度"但无大碍。山上有雷，雷声稍微大了一些，但不足为患。得此卦者，在细节和小事上可以讲究和精致一些，但在大方向和原则问题上不要偏离正道。小小的"过度"有时是好事——做菜多加一点调料可能更美味，做事多花一点心思可能更完美。但小过卦强调"可小事不可大事"：不要在重大决策上冒险或走极端。建议你在日常生活中追求精致和品质，在细节处用心，但同时守住大方向不偏航。' },
+  63: { name: '水火既济', symbol: '䷾', judgment: '亨小，利贞，初吉终乱', interpretation: '既济卦代表目标达成、事情完成。水在火上，水火交融，烹饪完成。恭喜你——某个阶段的目标已经达成！你的努力得到了回报。然而既济卦最深刻的智慧在于"初吉终乱"：成功本身就暗藏着危机。当一件事情完成之后，新的挑战即刻开始。人们在成功之后容易松懈，而松懈往往导致后来的混乱。建议你在庆祝胜利的同时，立刻开始思考下一步。不要让成功成为松懈的开始，而应让它成为下一个更高目标的起点。不忘初心方得始终。' },
+  64: { name: '火水未济', symbol: '䷿', judgment: '亨，小狐汔济濡其尾，无攸利', interpretation: '未济卦以"小狐狸差一点就能过河，却弄湿了尾巴"为喻，生动地描述了功亏一篑的状态。火在水上，无法煮熟食物——事情还没完成。得此卦者，你可能离目标只有一步之遥，却卡在了最后关头。这令人沮丧，但不代表失败——只是还需要最后一把力。未济卦告诉我们：越是接近终点，越要保持耐心和专注。许多人不是在困难面前放弃的，而是在即将成功时松懈的。建议你重新审视目前的情况，看看是哪里差了那么一点。坚持最后一口气，功成就在眼前。' },
 }
 
 // Simulate coin toss for one line
 function tossCoins(): { type: '老阳' | '老阴' | '少阳' | '少阴'; changing: boolean } {
-  const toss = Math.floor(Math.random() * 4) // 0-3 heads
-  if (toss === 3) return { type: '老阳', changing: true }  // 3 heads
-  if (toss === 0) return { type: '老阴', changing: true }  // 0 heads (3 tails)
-  if (toss === 2) return { type: '少阳', changing: false } // 2 heads
-  return { type: '少阴', changing: false }                  // 1 head
+  const toss = Math.floor(Math.random() * 4)
+  if (toss === 3) return { type: '老阳', changing: true }
+  if (toss === 0) return { type: '老阴', changing: true }
+  if (toss === 2) return { type: '少阳', changing: false }
+  return { type: '少阴', changing: false }
 }
 
 function getHexagramNumber(lines: Array<{ type: string }>): number {
-  // Bottom line is position 0 (line 1), top line is position 5 (line 6)
-  // Yang lines (老阳/少阳) = 1, Yin lines (老阴/少阴) = 0
   let num = 0
   for (let i = 0; i < 6; i++) {
     const isYang = lines[i].type === '老阳' || lines[i].type === '少阳'
     if (isYang) num += Math.pow(2, i)
   }
-  // Convert to hexagram number (1-64)
-  // This is simplified — real conversion is more complex
   return (num % 64) + 1
 }
 
+type Phase = 'input' | 'loading' | 'result'
+
 export default function IChing() {
   const [question, setQuestion] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [phase, setPhase] = useState<Phase>('input')
   const [lines, setLines] = useState<Array<{ type: '老阳' | '老阴' | '少阳' | '少阴'; changing: boolean }> | null>(null)
-  const [showResult, setShowResult] = useState(false)
 
   const handleCast = async () => {
-    setLoading(true)
+    setPhase('loading')
     setLines(null)
-    setShowResult(false)
 
-    // Simulate casting 6 lines (one at a time for dramatic effect)
+    // Cast all 6 lines at once
+    await new Promise((r) => setTimeout(r, 1800))
     const newLines: Array<{ type: '老阳' | '老阴' | '少阳' | '少阴'; changing: boolean }> = []
     for (let i = 0; i < 6; i++) {
-      await new Promise((r) => setTimeout(r, 400))
       newLines.push(tossCoins())
-      setLines([...newLines])
     }
+    setLines(newLines)
+    await new Promise((r) => setTimeout(r, 400))
+    setPhase('result')
+  }
 
-    setLoading(false)
-    await new Promise((r) => setTimeout(r, 600))
-    setShowResult(true)
+  const handleReset = () => {
+    setPhase('input')
+    setLines(null)
+    setQuestion('')
   }
 
   const primaryNum = lines ? getHexagramNumber(lines) : 1
   const hasChanging = lines?.some((l) => l.changing)
-  // Transformed hexagram: flip changing lines
   const transformedLines = lines?.map((l) => {
     if (!l.changing) return l
     return l.type === '老阳'
       ? { type: '少阴' as const, changing: false }
       : { type: '少阳' as const, changing: false }
   })
-  const transformedNum = transformedLines ? getHexagramNumber(transformedLines) : null
+  const transformedNum = transformedLines && hasChanging ? getHexagramNumber(transformedLines) : null
 
   const primaryHex = HEXAGRAMS[primaryNum] || HEXAGRAMS[1]
   const transformedHex = transformedNum ? HEXAGRAMS[transformedNum] : null
@@ -140,13 +139,11 @@ export default function IChing() {
     '少阴': '⚋⚋',
   }
 
+  const lineNames = ['初爻', '二爻', '三爻', '四爻', '五爻', '上爻']
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-12 sm:py-16">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-12"
-      >
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
         <h1 className="text-4xl sm:text-5xl font-bold text-gradient mb-4 font-[family-name:var(--font-heading-cn)]">
           易经占卜
         </h1>
@@ -157,88 +154,45 @@ export default function IChing() {
         </p>
       </motion.div>
 
-      {!lines && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="glass p-6 sm:p-8 rounded-2xl max-w-lg mx-auto"
-        >
-          <Input
-            label="你想问什么？（可选）"
-            placeholder="默念你的问题，或留空..."
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            className="mb-6"
-          />
-          <Button
-            variant="gold"
-            size="lg"
-            className="w-full"
-            onClick={handleCast}
-            loading={loading}
-          >
-            {loading ? '正在抛掷铜钱...' : '开始起卦'}
+      {/* Input phase */}
+      {phase === 'input' && (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          className="glass p-6 sm:p-8 rounded-2xl max-w-lg mx-auto">
+          <Input label="你想问什么？（可选）" placeholder="默念你的问题，或留空..."
+            value={question} onChange={(e) => setQuestion(e.target.value)} className="mb-6" />
+          <Button variant="gold" size="lg" className="w-full" onClick={handleCast}>
+            开始起卦
           </Button>
         </motion.div>
       )}
 
-      {/* Casting animation */}
-      {lines && lines.length < 6 && (
-        <div className="max-w-md mx-auto">
-          <LoadingSpinner text="铜钱在空中旋转..." />
-          <div className="space-y-3 mt-6">
-            {lines.map((line, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="glass p-4 rounded-xl text-center"
-              >
-                <div className="text-sm text-text-secondary">第{i + 1}爻（从下往上）</div>
-                <div className="text-lg font-bold text-gold mt-1">{line.type}</div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Loading phase */}
+      {phase === 'loading' && <LoadingSpinner text="铜钱已在空中，天地玄机正在显现..." />}
 
-      {/* Complete result */}
+      {/* Result phase */}
       <AnimatePresence>
-        {showResult && lines && lines.length === 6 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <FortuneResult
-              title="卦象已成"
-              subtitle={question ? `所问：${question}` : '请解读卦象'}
-            >
+        {phase === 'result' && lines && lines.length === 6 && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+            <FortuneResult title="卦象已成" subtitle={question ? `所问：${question}` : '请静心解读以下卦象'}>
               {/* Hexagram display */}
               <div className="grid sm:grid-cols-2 gap-6 mb-8">
-                {/* Primary hexagram */}
-                <div className="text-center">
-                  <div className="text-6xl mb-3">{primaryHex.symbol}</div>
-                  <h3 className="text-xl font-bold text-gold font-[family-name:var(--font-heading-cn)]">
-                    本卦：{primaryHex.name}
-                  </h3>
-                  <p className="text-sm text-text-secondary mt-1">卦辞：{primaryHex.judgment}</p>
+                <div className="glass p-6 text-center rounded-2xl">
+                  <div className="text-7xl mb-4">{primaryHex.symbol}</div>
+                  <h3 className="text-xl font-bold text-gold font-[family-name:var(--font-heading-cn)]">本卦：{primaryHex.name}</h3>
+                  <p className="text-sm text-text-secondary mt-2">卦辞：{primaryHex.judgment}</p>
                 </div>
-
-                {/* Transformed hexagram */}
-                <div className="text-center">
+                <div className="glass p-6 text-center rounded-2xl">
                   {transformedHex ? (
                     <>
-                      <div className="text-6xl mb-3">{transformedHex.symbol}</div>
-                      <h3 className="text-xl font-bold text-gold font-[family-name:var(--font-heading-cn)]">
-                        变卦：{transformedHex.name}
-                      </h3>
-                      <p className="text-sm text-text-secondary mt-1">卦辞：{transformedHex.judgment}</p>
+                      <div className="text-7xl mb-4">{transformedHex.symbol}</div>
+                      <h3 className="text-xl font-bold text-gold font-[family-name:var(--font-heading-cn)]">变卦：{transformedHex.name}</h3>
+                      <p className="text-sm text-text-secondary mt-2">卦辞：{transformedHex.judgment}</p>
                     </>
                   ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <p className="text-text-secondary">无变爻，以本卦为准</p>
+                    <div className="flex flex-col items-center justify-center h-full py-8">
+                      <div className="text-4xl mb-3">☯️</div>
+                      <p className="text-text-secondary">六爻皆静，无变卦</p>
+                      <p className="text-xs text-text-secondary/60 mt-1">以本卦卦辞为最终解读</p>
                     </div>
                   )}
                 </div>
@@ -246,59 +200,37 @@ export default function IChing() {
 
               {/* Six lines */}
               <div className="mb-8">
-                <h3 className="text-lg font-bold text-gold mb-4 font-[family-name:var(--font-heading-cn)]">
-                  六爻详情（从下往上）
-                </h3>
+                <h3 className="text-lg font-bold text-gold mb-4 font-[family-name:var(--font-heading-cn)]">六爻详情（从下往上）</h3>
                 <div className="space-y-2">
                   {lines.map((line, i) => (
-                    <div
-                      key={i}
-                      className={`flex items-center gap-4 p-3 rounded-xl ${
-                        line.changing ? 'glass border border-gold/30' : 'bg-white/[0.02]'
-                      }`}
-                    >
-                      <span className="text-sm text-text-secondary w-16">第{i + 1}爻</span>
-                      <span className={`font-bold ${line.changing ? 'text-gold' : 'text-text-primary'}`}>
-                        {line.type}
-                      </span>
-                      <span className="text-xs text-text-secondary/60 hidden sm:inline">
-                        {lineSymbols[line.type]}
-                      </span>
-                      {line.changing && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-gold/10 text-gold ml-auto">
-                          变爻
-                        </span>
-                      )}
+                    <div key={i} className={`flex items-center gap-4 p-3 rounded-xl transition-all ${line.changing ? 'glass border border-gold/30 bg-gold/5' : 'bg-white/[0.02]'}`}>
+                      <span className="text-sm text-text-secondary w-16">{lineNames[i]}</span>
+                      <span className={`font-bold text-lg ${line.changing ? 'text-gold' : 'text-text-primary'}`}>{line.type}</span>
+                      <span className="text-xs text-text-secondary/60 hidden sm:inline">{lineSymbols[line.type]}</span>
+                      {line.changing && <span className="text-xs px-2 py-0.5 rounded-full bg-gold/10 text-gold ml-auto">变爻</span>}
                     </div>
                   ))}
                 </div>
-                {!hasChanging && (
-                  <p className="text-xs text-text-secondary mt-3 text-center">
-                    六爻皆静，以本卦卦辞为准
-                  </p>
-                )}
+                {!hasChanging && <p className="text-xs text-text-secondary mt-3 text-center">六爻皆静，以本卦卦辞为准。无变爻意味着当前局势稳定，变化尚未到来。</p>}
+                {hasChanging && <p className="text-xs text-gold/80 mt-3 text-center">存在变爻，变卦代表事物发展的趋势和最终走向，请同时参考变卦启示。</p>}
               </div>
 
-              {/* Interpretation */}
-              <div>
-                <h3 className="text-lg font-bold text-gold mb-4 font-[family-name:var(--font-heading-cn)]">
-                  卦象解读
-                </h3>
-                <p className="text-text-primary leading-relaxed mb-4">{primaryHex.interpretation}</p>
+              {/* Expanded interpretation */}
+              <div className="space-y-6">
+                <div className="glass p-6 rounded-xl border border-gold/10">
+                  <h3 className="text-lg font-bold text-gold mb-3 font-[family-name:var(--font-heading-cn)]">📜 本卦详解 — {primaryHex.name}</h3>
+                  <p className="text-text-primary leading-relaxed">{primaryHex.interpretation}</p>
+                </div>
                 {transformedHex && (
-                  <>
-                    <h4 className="font-bold text-gold/80 mt-4 mb-2 font-[family-name:var(--font-heading-cn)]">
-                      变卦启示
-                    </h4>
+                  <div className="glass p-6 rounded-xl border border-gold/10">
+                    <h3 className="text-lg font-bold text-gold mb-3 font-[family-name:var(--font-heading-cn)]">🔄 变卦启示 — {transformedHex.name}</h3>
                     <p className="text-text-primary leading-relaxed">{transformedHex.interpretation}</p>
-                  </>
+                  </div>
                 )}
               </div>
 
               <div className="mt-8 text-center">
-                <Button variant="ghost" onClick={() => { setLines(null); setShowResult(false); setQuestion('') }}>
-                  重新起卦
-                </Button>
+                <Button variant="ghost" onClick={handleReset}>重新起卦</Button>
               </div>
             </FortuneResult>
           </motion.div>
